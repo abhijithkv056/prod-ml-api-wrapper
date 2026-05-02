@@ -42,11 +42,24 @@ q2-ml-model-api/
 - `GET /health` - health endpoint
 - `GET /metrics` - Prometheus metrics endpoint
 
+## Design Choices
+
+- **FastAPI + Pydantic**: chosen for concise API development, strong request validation, and clear schema-driven contracts.
+- **Separated layers**: routing (`app/api`), schema models (`app/models`), model logic (`app/services`), and monitoring (`app/monitoring`) are split for maintainability.
+- **Structured errors**: validation and server errors return consistent JSON shapes to simplify client-side handling.
+- **Built-in observability**: request count and latency metrics are captured via middleware and exposed through `/metrics`, with Prometheus/Grafana support for quick monitoring.
+
 ## Model Logic
 
 The dummy model is rule-based:
 - if `transaction_amount` is a whole odd number -> `0.85` (high fraud probability)
 - else -> `0.15` (low fraud probability)
+
+## Assumptions Made
+
+`odd/even` is evaluated only for whole-number amounts (for example, `101.00` is treated as odd, while `101.01` is not). 
+This rule is intentionally simplistic and only used as dummy logic for the assignment.
+Batch inference is limited to at most 100 transactions per request, as required.
 
 ## Run Locally
 
