@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Response
 from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
 
@@ -16,9 +15,5 @@ REQUEST_LATENCY = Histogram(
 )
 
 
-router = APIRouter(tags=["monitoring"])
-
-
-@router.get("/metrics")
-async def metrics() -> Response:
-    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+def generate_metrics_payload() -> tuple[bytes, str]:
+    return generate_latest(), CONTENT_TYPE_LATEST

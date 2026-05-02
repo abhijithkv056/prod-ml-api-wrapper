@@ -13,11 +13,15 @@ Production-style FastAPI service for a dummy fraud model, with:
 q2-ml-model-api/
 ├─ app/
 │  ├─ api/
+│  │  ├─ health.py                   # /health endpoint
+│  │  ├─ metrics.py                  # /metrics endpoint
 │  │  └─ predict.py                  # /predict and /predict/batch endpoints
+│  ├─ core/
+│  │  └─ errors.py                   # exception handler registration
 │  ├─ models/
 │  │  └─ transactions.py             # Request/response and transaction schemas
 │  ├─ monitoring/
-│  │  ├─ metrics.py                  # Prometheus counters/histograms + /metrics router
+│  │  ├─ metrics.py                  # Prometheus counters/histograms
 │  │  ├─ middleware.py               # HTTP latency + volume middleware
 │  │  └─ grafana/
 │  │     ├─ dashboards/
@@ -27,8 +31,7 @@ q2-ml-model-api/
 │  │        └─ datasources/prometheus.yml
 │  ├─ services/
 │  │  └─ fraud_model.py              # Dummy model inference logic
-│  └─ main.py                        # App factory and wiring
-├─ main.py                           # Entrypoint shim (imports app.main:app)
+│  └─ main.py                        # App wiring/composition root
 ├─ docker-compose.yml
 ├─ Dockerfile
 ├─ prometheus.yml
@@ -72,7 +75,7 @@ uv sync
 2) Start API:
 
 ```bash
-uv run uvicorn main:app --host 0.0.0.0 --port 8000
+uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 3) Test:
