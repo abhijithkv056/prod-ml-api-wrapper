@@ -20,6 +20,6 @@ services:
     volumes:
       - ./app/monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
       - ./app/monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./app/monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards/json:ro
+      - ./app/monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     depends_on:
       - prometheus
