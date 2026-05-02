@@ -48,8 +48,9 @@ q2-ml-model-api/
 ## Design Choices
 
 - **FastAPI + Pydantic**: chosen for concise API development, strong request validation, and clear schema-driven contracts.
-- **Separated layers**: routing (`app/api`), schema models (`app/models`), model logic (`app/services`), and monitoring (`app/monitoring`) are split for maintainability.
-- **Structured errors**: validation and server errors return consistent JSON shapes to simplify client-side handling.
+- **Separated layers**: routing (`app/api`), schema models (`app/models`), model logic (`app/services`), monitoring primitives (`app/monitoring`), and error registration (`app/core`) are split for maintainability.
+- **Composition root in `app/main.py`**: `main.py` only wires middleware, exception handlers, and routers, while endpoint and handler logic live in dedicated modules.
+- **Structured errors**: validation, model, and server failures return consistent JSON shapes to simplify client-side handling.
 - **Built-in observability**: request count and latency metrics are captured via middleware and exposed through `/metrics`, with Prometheus/Grafana support for quick monitoring.
 
 ## Model Logic
@@ -81,8 +82,8 @@ uv run uvicorn app.main:app --host 0.0.0.0 --port 8000
 3) Test:
 
 ```bash
-curl -X POST http://localhost:8000/predict ^
-  -H "Content-Type: application/json" ^
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
   -d "{\"transaction\":{\"transaction_amount\":101.00,\"merchant_id\":\"m_123\",\"transaction_time\":\"2026-05-01T10:00:00Z\",\"user_location\":{\"latitude\":12.9,\"longitude\":77.6}}}"
 ```
 
@@ -111,3 +112,5 @@ Grafana auto-loads:
 - Payload schemas are defined in `app/models/transactions.py`
 - Unknown fields are rejected (`extra="forbid"`)
 - Validation errors return consistent `422` JSON payloads
+- Model inference failures return `503` with `model_error`
+- Unhandled exceptions return `500` with `internal_error`
